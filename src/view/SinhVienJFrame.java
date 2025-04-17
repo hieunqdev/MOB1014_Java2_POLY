@@ -6,6 +6,7 @@ package view;
 
 import entity.SinhVien;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import repository.SinhVienRepository;
 
@@ -21,6 +22,7 @@ public class SinhVienJFrame extends javax.swing.JFrame {
     public SinhVienJFrame() {
         initComponents();
         readSinhVien();
+        readSinhVienCuoiCung();
     }
     
     public void readSinhVien() {
@@ -28,7 +30,7 @@ public class SinhVienJFrame extends javax.swing.JFrame {
         
         DefaultTableModel tblSinhVien = (DefaultTableModel) this.tblSinhVien.getModel();
         tblSinhVien.setRowCount(0);
-        
+
         for (SinhVien sinhVien : sinhVienLst) {
             tblSinhVien.addRow(new Object[] {
                 sinhVien.getMaSV(),
@@ -36,6 +38,20 @@ public class SinhVienJFrame extends javax.swing.JFrame {
                 sinhVien.isGioiTinh() ? "Nam" : "Nữ",
                 sinhVien.getTuoi()
             });
+        }   
+    }
+    
+    public void readSinhVienCuoiCung() {
+        SinhVien sinhVienCuoiCung = SinhVienRepository.readSinhVienCuoiCung();
+        
+        txtMa.setText(sinhVienCuoiCung.getMaSV());
+        txtTen.setText(sinhVienCuoiCung.getTenSV());
+        txtNamSinh.setText(sinhVienCuoiCung.getTuoi() + "");
+        
+        if (sinhVienCuoiCung.isGioiTinh()) {
+            rdoNam.setSelected(true);
+        } else {
+            rdoNu.setSelected(true);
         }
     }
 
@@ -62,6 +78,7 @@ public class SinhVienJFrame extends javax.swing.JFrame {
         btnThem = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblSinhVien = new javax.swing.JTable();
+        btnClear = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -82,6 +99,11 @@ public class SinhVienJFrame extends javax.swing.JFrame {
         rdoNu.setText("Nữ");
 
         btnThem.setText("Thêm");
+        btnThem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnThemActionPerformed(evt);
+            }
+        });
 
         tblSinhVien.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -94,7 +116,19 @@ public class SinhVienJFrame extends javax.swing.JFrame {
                 "Mã", "Tên", "Giới tính", "Năm sinh"
             }
         ));
+        tblSinhVien.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblSinhVienMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblSinhVien);
+
+        btnClear.setText("Clear");
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -119,12 +153,16 @@ public class SinhVienJFrame extends javax.swing.JFrame {
                     .addComponent(jLabel4))
                 .addGap(50, 50, 50)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnThem)
-                    .addComponent(txtNamSinh, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(rdoNam)
                         .addGap(74, 74, 74)
-                        .addComponent(rdoNu)))
+                        .addComponent(rdoNu))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(btnThem)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnClear))
+                        .addComponent(txtNamSinh, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(61, 61, 61))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
@@ -154,7 +192,9 @@ public class SinhVienJFrame extends javax.swing.JFrame {
                     .addComponent(txtTen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtNamSinh, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(79, 79, 79)
-                .addComponent(btnThem)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnThem)
+                    .addComponent(btnClear))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 87, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -162,6 +202,63 @@ public class SinhVienJFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void tblSinhVienMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblSinhVienMouseClicked
+        // TODO add your handling code here:
+        int soHangNgangDuocChon = tblSinhVien.getSelectedRow();
+        
+        String maSV = tblSinhVien.getValueAt(soHangNgangDuocChon, 0).toString();
+        String tenSV = tblSinhVien.getValueAt(soHangNgangDuocChon, 1).toString();
+        String tuoi = tblSinhVien.getValueAt(soHangNgangDuocChon, 3).toString();
+        
+        txtMa.setText(maSV);
+        txtTen.setText(tenSV);
+        txtNamSinh.setText(tuoi);
+        
+        String gioiTinh = tblSinhVien.getValueAt(soHangNgangDuocChon, 2).toString();
+        if (gioiTinh == "Nam") {
+            rdoNam.setSelected(true);
+        } else {
+            rdoNu.setSelected(true);
+        }
+    }//GEN-LAST:event_tblSinhVienMouseClicked
+
+    private void btnThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemActionPerformed
+        // TODO add your handling code here:
+        if (txtMa.getText().isEmpty() || txtMa.getText() == null) {
+            JOptionPane.showMessageDialog(this, "Mã sinh viên không được trống");
+        }
+        
+        if (txtTen.getText().isEmpty() || txtTen.getText() == null) {
+            JOptionPane.showMessageDialog(this, "Tên sinh viên không được trống");
+        }
+        
+        if (txtNamSinh.getText().isEmpty() || txtNamSinh.getText() == null) {
+            JOptionPane.showMessageDialog(this, "Tuổi sinh viên không được trống");
+        }
+        
+        String maSV = txtMa.getText();
+        String tenSV = txtTen.getText();
+        boolean gioiTinh = rdoNam.isSelected() ? true : false;
+        int tuoi = Integer.parseInt(txtNamSinh.getText());
+
+        SinhVien sinhVien = new SinhVien(maSV, tenSV, gioiTinh, tuoi);
+     
+        int ketQua = SinhVienRepository.createSinhVien(sinhVien);
+        if (ketQua != 0) {
+            JOptionPane.showMessageDialog(this, "Thêm thành công");
+        } else {
+            JOptionPane.showMessageDialog(this, "Thêm thất bại");
+        }
+        
+    }//GEN-LAST:event_btnThemActionPerformed
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+        // TODO add your handling code here:
+        txtMa.setText("");
+        txtTen.setText("");
+        txtNamSinh.setText("");
+    }//GEN-LAST:event_btnClearActionPerformed
 
     /**
      * @param args the command line arguments
@@ -199,6 +296,7 @@ public class SinhVienJFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnClear;
     private javax.swing.JButton btnThem;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel jLabel1;
